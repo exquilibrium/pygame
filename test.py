@@ -20,16 +20,52 @@ mixer.music.load("background.wav")
 
 # Caption and Icon
 pygame.display.set_caption("Space Invader")
-# icon = pygame.image.load("ufo.png")
-# pygame.display.set_icon(icon)
+icon = pygame.image.load("ufo.png")
+pygame.display.set_icon(icon)
 
 # Player
 playerImg = pygame.image.load("player.png")
 playerX = 370
 playerY = 480
-player_change = 0
+playerX_change = 0
 
-# Main Loop
+# Enemy
+enemyImg = pygame.image.load("enemy.png")
+enemyImgs = []
+enemyXs = []
+enemyYs = []
+enemyX_changes = []
+enemyY_changes = []
+num_of_enemies = 6
+
+for i in range(num_of_enemies):
+    enemyImgs.append(enemyImg)
+    enemyXs.append(random.randint(0,756))
+    enemyYs.append(random.randint(50,150))
+    enemyX_changes.append(4)
+    enemyY_changes.append(40)
+
+
+# Bullet
+bulletImg = pygame.image.load("bullet.png")
+bulletX = 0
+bulletY = 480
+bulletX_change = 0
+bulletY_change = 10
+bullet_state = "ready"
+
+# Functions
+def player(x,y):
+    screen.blit(playerImg, (playerX, playerY))
+
+
+
+def fire_bullet(x,y):
+    global bullet_state
+    bullet_state = "fire"
+    screen.blit(bulletImg, (x+16, y+10))
+
+# Game Loop
 running = True
 while running:
     
@@ -40,13 +76,43 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        # Check for events
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player_change = -5
+                playerX_change = -5
+            if event.key == pygame.K_RIGHT:
+                playerX_change = 5
+            if event.key == pygame.K_SPACE:
+                if bullet_state == "ready":
+                    bulletSound = mixer.Sound("laser.wav")
+                    bulletSound.play()
+                    # Current playerX
+                    bulletX = playerX
+                    fire_bullet(bulletX, bulletY)
+                    
 
-    playerX = playerX + player_change  
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                playerX_change = 0
 
-    screen.blit(playerImg, (playerX, playerY))
+    # Change player position
+    playerX = playerX + playerX_change  
+    if playerX <= 0:
+        playerX = 0
+    elif playerX >= 736:
+        playerX = 736
+
+    # Change bullet position
+    if bulletY <= 0:
+        bulletY = 480
+        bullet_state = "ready"
+    
+    if bullet_state == "fire":
+        fire_bullet(bulletX, bulletY)
+        bulletY -= bulletY_change # <=> bulletY = bulletY - bulletY_change
+        
+
+    player(playerX, playerY)
     pygame.display.update()
 
 pygame.quit()
