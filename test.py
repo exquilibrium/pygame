@@ -1,5 +1,4 @@
 # import libraries
-from logging import logMultiprocessing
 import math
 import random
 
@@ -189,7 +188,7 @@ while running:
         if bullet_state == "fire":
             fire_bullet(bulletX, bulletY)
             bulletY -= bulletY_change # <=> bulletY = bulletY - bulletY_change
-            
+
     elif game_state == "ended":
         game_over_text()
 
